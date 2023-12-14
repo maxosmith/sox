@@ -2,42 +2,60 @@ import numpy as np
 
 
 def stack_ragged_arrays(arrays, max_len: int | None = None, padding_value: int = 0):
-  """Stacks a list of ragged arrays (arrays of different lengths) into a single numpy array.
+    """Stacks a list of ragged arrays (arrays of different lengths) into a single numpy array.
 
-  Args:
-    arrays: The list of arrays to stack.
-    max_len: The maximum length of the arrays in the stacked array.
-                                If not specified, it defaults to the length of the longest array.
-    padding_value: The value to use for padding shorter arrays. Defaults to 0.
+    Args:
+      arrays: The list of arrays to stack.
+      max_len: The maximum length of the arrays in the stacked array.
+                                  If not specified, it defaults to the length of the longest array.
+      padding_value: The value to use for padding shorter arrays. Defaults to 0.
 
-  Returns:
-    numpy.ndarray: A stacked array of the input arrays.
-  """
-  if not arrays:  # Check if the array list is empty
-    return np.array([], dtype=int)
+    Returns:
+      numpy.ndarray: A stacked array of the input arrays.
+    """
+    if not arrays:  # Check if the array list is empty
+        return np.array([], dtype=int)
 
-  # Find the maximum length if not provided
-  if max_len is None:
-    max_len = max(len(arr) for arr in arrays)
+    # Find the maximum length if not provided
+    if max_len is None:
+        max_len = max(len(arr) for arr in arrays)
 
-  # Initialize the stacked array with padding values
-  stacked_array = np.full((len(arrays), max_len), padding_value, dtype=arrays[0].dtype)
+    # Initialize the stacked array with padding values
+    stacked_array = np.full((len(arrays), max_len), padding_value, dtype=arrays[0].dtype)
 
-  # Assign the values from the original arrays to the stacked array
-  for i, arr in enumerate(arrays):
-    stacked_array[i, : len(arr)] = arr
+    # Assign the values from the original arrays to the stacked array
+    for i, arr in enumerate(arrays):
+        stacked_array[i, : len(arr)] = arr
 
-  return stacked_array
+    return stacked_array
 
 
 def unstack(a: np.ndarray, axis: int = 0):
-  """Unstack an axis of an array.
+    """Unstack an axis of an array.
 
-  Args:
-    a: Array to unstack.
-    axis: Axis to remove.
+    Args:
+      a: Array to unstack.
+      axis: Axis to remove.
 
-  Returns:
-    List of arrays that are from `a`.
-  """
-  return [np.squeeze(e, axis) for e in np.split(a, a.shape[axis], axis=axis)]
+    Returns:
+      List of arrays that are from `a`.
+    """
+    return [np.squeeze(e, axis) for e in np.split(a, a.shape[axis], axis=axis)]
+
+
+def uniform_like(a: np.ndarray) -> np.ndarray:
+    """Compute an array of the same shape with a uniform distribution of entries.
+
+    Args:
+        a: Input numpy array.
+
+    Returns:
+        An array of the same shape as `a`, where each element is 1 divided by
+          the total number of elements in `a`. If `a` is empty, returns an array
+          of the same shape filled with `np.nan`.
+    """
+    a = np.asarray(a)
+
+    if a.size == 0:
+        return np.full_like(a, 1.0, dtype=float)
+    return np.full_like(a, 1.0 / a.size, dtype=float)
